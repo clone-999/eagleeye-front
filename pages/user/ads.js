@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import PropertyAd from '../../components/PropertyAd';
 import UserRoute from '../../components/routes/UserRoute';
 import { Context } from '../../context';
+import { serverUrl } from '../../utils/fetchApi';
 
 const Ads = () => {
     const {
@@ -15,7 +16,7 @@ const Ads = () => {
     }, []);
 
     const loadProperties = async () => {
-        const { data } = await axios.get("/api/partner-properties");
+        const { data } = await axios.get(`${serverUrl}/api/partner-properties`);
         setProperties(data);
     };
 

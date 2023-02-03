@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { SyncOutlined } from "@ant-design/icons";
+import { serverUrl } from "../utils/fetchApi";
 
 function Register() {
     const [name, setName] = useState("");
@@ -27,7 +28,7 @@ function Register() {
         // console.table({ name, email, password });
         try {
           setLoading(true);
-          const { data } = await axios.post(`/api/register`, {
+          const { data } = await axios.post(`${serverUrl}/api/register`, {
             name,
             email,
             password,

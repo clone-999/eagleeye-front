@@ -1,5 +1,6 @@
 import axios from "axios";
 
+export const serverUrl = 'https://eagleeye-back-end.onrender.com';
 export const baseUrl = 'https://bayut.p.rapidapi.com';
 export const carBaseUrl = 'booking-com.p.rapidapi.com';
 

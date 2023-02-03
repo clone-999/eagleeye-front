@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { SyncOutlined } from "@ant-design/icons";
+import { serverUrl } from "../utils/fetchApi";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ function Login() {
         // console.table({ name, email, password });
         try {
           setLoading(true);
-          const { data } = await axios.post(`/api/login`, {
+          const { data } = await axios.post(`${serverUrl}/api/login`, {
             email,
             password,
           });

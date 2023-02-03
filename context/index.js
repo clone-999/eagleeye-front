@@ -1,6 +1,7 @@
 import { useReducer, createContext, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
+import { serverUrl } from "../utils/fetchApi";
 
 // initial state
 const intialState = {
@@ -49,7 +50,7 @@ const Provider = ({ children }) => {
       if (res.status === 401 && res.config && !res.config.__isRetryRequest) {
         return new Promise((resolve, reject) => {
           axios
-            .get("/api/logout")
+            .get(`${serverUrl}/api/logout`)
             .then((data) => {
               console.log("/401 error > logout");
               dispatch({ type: "LOGOUT" });
@@ -68,7 +69,7 @@ const Provider = ({ children }) => {
 
   useEffect(() => {
     const getCsrfToken = async () => {
-      const { data } = await axios.get("/api/csrf-token");
+      const { data } = await axios.get(`${serverUrl}/api/csrf-token`);
       // console.log("CSRF", data);
       axios.defaults.headers["X-CSRF-Token"] = data.getCsrfToken;
     };

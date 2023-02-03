@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { SyncOutlined } from "@ant-design/icons";
+import { serverUrl } from "../../utils/fetchApi";
 
 const UserRoute = ({ children, showNav = true }) => {
   // state
@@ -15,7 +16,7 @@ const UserRoute = ({ children, showNav = true }) => {
 
   const fetchUser = async () => {
     try {
-      const { data } = await axios.get("/api/current-user");
+      const { data } = await axios.get(`${serverUrl}/api/current-user`);
       //   console.log(data);
       if (data.ok) setOk(true);
     } catch (err) {

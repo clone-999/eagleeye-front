@@ -42,7 +42,7 @@ const adsform = () => {
         try {
           // console.log(values);
           //alert("here")
-          const { data } = await axios.post("/api/property", propertyData);
+          const { data } = await axios.post(`${serverUrl}/api/property`, propertyData);
           toast("Great! We will review your ads, then you can start adding more");
           router.push("/user/ads");
         } catch (err) {
