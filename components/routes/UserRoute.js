@@ -16,9 +16,13 @@ const UserRoute = ({ children, showNav = true }) => {
 
   const fetchUser = async () => {
     try {
-      const { data } = await axios.get(`${serverUrl}/api/current-user`);
-      //   console.log(data);
-      if (data.ok) setOk(true);
+      const { data } = await axios.get(`/api/current-user`);
+      console.log("check here", ok);
+      if (data.ok) {
+        setOk(true)
+      } else {
+        return router.push("/login")
+      }
     } catch (err) {
       console.log(err);
       setOk(false);

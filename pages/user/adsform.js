@@ -6,6 +6,7 @@ import Amenities from '../../components/Amenities';
 import PhotosUploader from '../../components/PhotosUploader';
 import UserRoute from '../../components/routes/UserRoute';
 import { Context } from '../../context';
+import { serverUrl } from '../../utils/fetchApi';
 
 const adsform = () => {
     const {
@@ -42,7 +43,7 @@ const adsform = () => {
         try {
           // console.log(values);
           //alert("here")
-          const { data } = await axios.post(`${serverUrl}/api/property`, propertyData);
+          const { data } = await axios.post(`/api/property`, propertyData);
           toast("Great! We will review your ads, then you can start adding more");
           router.push("/user/ads");
         } catch (err) {

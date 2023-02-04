@@ -16,7 +16,7 @@ const Ads = () => {
     }, []);
 
     const loadProperties = async () => {
-        const { data } = await axios.get(`${serverUrl}/api/partner-properties`);
+        const { data } = await axios.get(`/api/partner-properties`);
         setProperties(data);
     };
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { Context } from '../context';
 import axios from 'axios';
 import { serverUrl } from '../utils/fetchApi';
+import { toast } from 'react-toastify';
 
 const TopNav = () => {
     const { state, dispatch } = useContext(Context);
@@ -20,7 +21,7 @@ const TopNav = () => {
     const logout = async () => {
         dispatch({ type: "LOGOUT" });
         window.localStorage.removeItem("user");
-        const { data } = await axios.get(`${serverUrl}/api/current-user`);
+        const { data } = await axios.get(`/api/current-user`);
         toast(data.message);
         router.push("/login");
     };
