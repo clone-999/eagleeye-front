@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { AutoComplete } from 'antd';
-import { airBaseUrl, airFetchApi } from '../utils/fetchApi';
+import { carBaseUrl, carFetchApi } from '../utils/fetchApi';
 import { useRouter } from 'next/router';
 
 const HolidaySearch = ({setLoading, loading, rquery}) => {
@@ -13,7 +13,7 @@ const HolidaySearch = ({setLoading, loading, rquery}) => {
         if (searchTerm !== '') {
             const fetchData = async () => {
                 try {
-                    const data = await airFetchApi(`${airBaseUrl}/v1/hotels/locations?name=${searchTerm}&locale=en-gb`);
+                    const data = await carFetchApi(`${carBaseUrl}/v1/hotels/locations?name=${searchTerm}&locale=en-gb`);
                     const locates = [];
                     data?.map((location) => {
                         locates.push({label: location.label, value: [location.dest_id, location.label]})

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NumericFormat } from 'react-number-format';
-import { airBaseUrl, airFetchApi } from '../../utils/fetchApi';
+import { carBaseUrl, carFetchApi } from '../../utils/fetchApi';
 import 'antd/dist/antd.css';
 import { Carousel } from 'antd';
 import Image from 'next/image';
@@ -169,12 +169,12 @@ const HolidayHomeDetail = ({ holidayHomeDetails: { maxrate, currencycode, addres
 }
 
 export async function getServerSideProps({ params: { id } }) {
-    const data = await airFetchApi(`${airBaseUrl}/v1/hotels/data?hotel_id=${id}&locale=en-gb`);
-    const payFeaturesData = await airFetchApi(`${airBaseUrl}/v1/hotels/payment-features?hotel_id=${id}&locale=en-gb`);
-    const photosData = await airFetchApi(`${airBaseUrl}/v1/hotels/photos?hotel_id=${id}&locale=en-gb`);
-    const descriptionData = await airFetchApi(`${airBaseUrl}/v1/hotels/description?hotel_id=${id}&locale=en-gb`);
-    const reviewScoresData = await airFetchApi(`${airBaseUrl}/v1/hotels/review-scores?hotel_id=${id}&locale=en-gb`);
-    const facilitiesData = await airFetchApi(`${airBaseUrl}/v1/hotels/facilities?hotel_id=${id}&locale=en-gb`);
+    const data = await carFetchApi(`${carBaseUrl}/v1/hotels/data?hotel_id=${id}&locale=en-gb`);
+    const payFeaturesData = await carFetchApi(`${carBaseUrl}/v1/hotels/payment-features?hotel_id=${id}&locale=en-gb`);
+    const photosData = await carFetchApi(`${carBaseUrl}/v1/hotels/photos?hotel_id=${id}&locale=en-gb`);
+    const descriptionData = await carFetchApi(`${carBaseUrl}/v1/hotels/description?hotel_id=${id}&locale=en-gb`);
+    const reviewScoresData = await carFetchApi(`${carBaseUrl}/v1/hotels/review-scores?hotel_id=${id}&locale=en-gb`);
+    const facilitiesData = await carFetchApi(`${carBaseUrl}/v1/hotels/facilities?hotel_id=${id}&locale=en-gb`);
     
     return {
       props: {

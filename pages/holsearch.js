@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import SearchFilters from '../components/SearchFilters';
-import { airBaseUrl, airFetchApi, baseUrl, fetchApi } from '../utils/fetchApi';
+import { carBaseUrl, carFetchApi, baseUrl, fetchApi } from '../utils/fetchApi';
 import { SyncOutlined } from "@ant-design/icons";
 import Property from '../components/Property';
 import HolidaySearch from '../components/HolidaySearch';
@@ -56,7 +56,7 @@ const HolSearch = ({ holidayHomes, rquery }) => {
 
 export async function getServerSideProps({ query }) {
   
-    const data = await airFetchApi(`${airBaseUrl}/v2/hotels/search?units=metric&adults_number=1&checkout_date=2022-12-12&filter_by_currency=AED&checkin_date=2022-12-11&locale=en-gb&dest_id=${query.dest_id}&order_by=popularity&dest_type=hotel&room_number=1&page_number=0&include_adjacency=true`);
+    const data = await carFetchApi(`${carBaseUrl}/v2/hotels/search?units=metric&adults_number=1&checkout_date=2022-12-12&filter_by_currency=AED&checkin_date=2022-12-11&locale=en-gb&dest_id=${query.dest_id}&order_by=popularity&dest_type=hotel&room_number=1&page_number=0&include_adjacency=true`);
   
     return {
       props: {
