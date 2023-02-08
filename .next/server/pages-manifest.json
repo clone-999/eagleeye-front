@@ -2,7 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/user": "pages/user.js",
-  "/": "pages/index.js",
-  "/login": "pages/login.js"
+  "/login": "pages/login.js",
+  "/user/adsform": "pages/user/adsform.js",
+  "/api/auth/[...nextauth]": "pages/api/auth/[...nextauth].js",
+  "/user/ads": "pages/user/ads.js"
 }

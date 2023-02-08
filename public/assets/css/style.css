@@ -1754,3 +1754,7 @@ height: 50px !important
   background:transparent;
   padding:1px;
 }
+
+.error {
+  color:  maroon;
+}

@@ -1,29 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { Context } from '../context';
-import axios from 'axios';
-import { serverUrl } from '../utils/fetchApi';
-import { toast } from 'react-toastify';
+import { signOut, useSession } from 'next-auth/react';
 
 const TopNav = () => {
-    const { state, dispatch } = useContext(Context);
-    const { user } = state;
-    const [current, setCurrent] = useState("");
+    const { status, data: session } = useSession();
 
-    const router = useRouter();
-
-    useEffect(() => {
-        (typeof window !== 'undefined') && setCurrent(window.location.pathname);
-    }, [(typeof window !== 'undefined') && window.location.pathname]);
-
-    const logout = async () => {
-        dispatch({ type: "LOGOUT" });
-        window.localStorage.removeItem("user");
-        const { data } = await axios.get(`/api/current-user`);
-        toast(data.message);
-        router.push("/login");
+    const logoutClickHandler = () => {
+        signOut({ callbackUrl: '/login' });
     };
 
     return (
@@ -53,10 +37,12 @@ const TopNav = () => {
                                 <div className="header-top-content">
                                     <div className="header-right d-flex align-items-center justify-content-end">
                                         <div className="header-right-action pt-1 pe-2">
-                                            {user ? (
+                                            { status === 'loading' ? (
+                                                'Loading'
+                                            ) :   session?.user ? (
                                                 <>
-                                                    <Link href="/user" className="theme-btn theme-btn-small theme-btn-transparent">{user?.name}</Link>
-                                                    <Link href="#" onClick={logout} className="theme-btn theme-btn-small ml-1">Logout</Link>
+                                                    <Link href="/user/profile" className="theme-btn theme-btn-small theme-btn-transparent">{session.user.name}</Link>
+                                                    <Link href="#" onClick={logoutClickHandler} className="theme-btn theme-btn-small ml-1">Logout</Link>
                                                 </>
                                             ) : (<>
                                                 <Link href="/login" className="theme-btn theme-btn-small theme-btn-transparent">Login</Link>
@@ -91,8 +77,10 @@ const TopNav = () => {
                                         <nav>
                                             <ul>
                                                 <li><Link href="/" title="home">HOME</Link></li>
-                                                {user && <>
-                                                    <li><Link href="/user" title="user account">MY ACCOUNT</Link></li>
+                                                { status === 'loading' ? (
+                                                'Loading'
+                                                ) : session?.user && <>
+                                                    <li><Link href="/user/profile" title="user account">MY ACCOUNT</Link></li>
                                                     <li><Link href="/user/ads" title="my ads">MY ADS</Link></li>
                                                     <li><Link href="/user/adsform" title="create new ads">POST ADS</Link></li>
                                                 </>}

@@ -1,53 +1,44 @@
-import { useState, useContext, useEffect } from "react";
-import axios from "axios";
-import { Context } from "../context";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { SyncOutlined } from "@ant-design/icons";
-import { serverUrl } from "../utils/fetchApi";
+import { signIn, useSession } from "next-auth/react";
+import { useForm } from 'react-hook-form';
 
 function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const { data: session } = useSession();
     const [loading, setLoading] = useState(false);
 
-    // state
-    const {
-        state: { user },
-        dispatch,
-    } = useContext(Context);
-    // const { user } = state;
-
-    // router
     const router = useRouter();
+    const { redirect } = router.query;
 
     useEffect(() => {
-        if (user !== null) router.push("/");
-    }, [user]);
+        if (session?.user) {
+            router.push(redirect || '/');
+        }
+    }, [router, session, redirect]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        // console.table({ name, email, password });
+    const {
+        handleSubmit,
+        register,
+        formState: { errors },
+    } = useForm();
+    const submitHandler = async ({ email, password }) => {
         try {
-          setLoading(true);
-          const { data } = await axios.post(`/api/login`, {
-            email,
-            password,
-          });
-          // console.log("LOGIN RESPONSE", data);
-          dispatch({
-            type: "LOGIN",
-            payload: data,
-          });
-          // save in local storage
-          window.localStorage.setItem("user", JSON.stringify(data));
-          // redirect
-          router.push("/user");
-          // setLoading(false);
+            setLoading(true);
+            const result = await signIn('credentials', {
+                redirect: false,
+                email,
+                password,
+            });
+            if (result.error) {
+                toast.error(result.error);
+            }
+            //setLoading(false);
         } catch (err) {
-          toast(err.response.data);
-          setLoading(false);
+            toast.error(getError(err));
+            setLoading(false);
         }
     };
 
@@ -64,13 +55,26 @@ function Login() {
                     </div>
                     <div className="modal-body">
                         <div className="contact-form-action">
-                            <form onSubmit={handleSubmit}>
+                            <form onSubmit={handleSubmit(submitHandler)}>
 
                                 <div className="input-box">
                                     <label className="label-text">Email Adress</label>
                                     <div className="form-group">
                                         <span className="la la-envelope form-icon"></span>
-                                        <input className="form-control" type="email" onChange={(e) => setEmail(e.target.value)} placeholder="Enter email" value={email} required />
+                                        <input 
+                                            type="email"
+                                            {...register('email', {
+                                            pattern: {
+                                                value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$/i,
+                                                message: 'Please enter valid email',
+                                            },
+                                            })} 
+                                            className="form-control"
+                                            placeholder="Enter your email"
+                                            id="email" />
+                                        {errors.email && (
+                                            <div className="error">{errors.email.message}</div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -78,21 +82,33 @@ function Login() {
                                     <label className="label-text">Password</label>
                                     <div className="form-group">
                                         <span className="la la-lock form-icon"></span>
-                                        <input className="form-control" type="password" placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                        <input 
+                                            type="password" 
+                                            {...register('password', {
+                                                required: 'Please enter password',
+                                                minLength: { value: 6, message: 'password should be more than 5 chars' },
+                                            })}
+                                            className="form-control" 
+                                            id="password"
+                                            autoFocus
+                                            placeholder="Enter password" />
+                                        {errors.password && (
+                                            <div className="error">{errors.password.message}</div>
+                                        )}
                                     </div>
                                 </div>
 
                                 <hr />
 
                                 <div className="form-group mt-3">
-                                    <button type="submit" disabled={!email || !password || loading} className="btn btn-default btn-lg btn-block effect" data-style="zoom-in">
+                                    <button type="submit" className="btn btn-default btn-lg btn-block effect" data-style="zoom-in">
                                         {loading ? <SyncOutlined spin /> : "Login"}
                                     </button>
                                 </div>
                             </form>
 
                             <div className="btn-box pb-1 mt-2">
-                                <Link href="/register" className="btn btn-block btn-outline-primary effect ladda-sm" data-style="zoom-in">Register</Link>
+                                <Link href={`/register?redirect=${redirect || '/'}`} className="btn btn-block btn-outline-primary effect ladda-sm" data-style="zoom-in">Register</Link>
                             </div>
                         </div>
                     </div>

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { NumericFormat } from 'react-number-format';
-import { baseUrl, fetchApi } from '../../utils/fetchApi';
 import 'antd/dist/antd.css';
 import { Carousel } from 'antd';
 import Image from 'next/image';
 import nl2br from 'react-nl2br';
-import axios from 'axios';
+import Property from '../../models/Property';
+import db from '../../utils/db';
 
 const PropertyView = ({ property }) => {
 
@@ -55,7 +55,7 @@ const PropertyView = ({ property }) => {
                 <div className="" style={{ borderRadius: 15, borderBlock: 'solid', overflow: 'hidden', overflowY: 'hidden !important', position: 'relative' }}>
                     <Carousel dotPosition={"right"} autoplay>
                         {property.photos.map((photo) => (
-                            <div key={photo.id}>
+                            <div key={photo._id}>
                                 <Image alt="Property Image" blurDataURL={photo.url} src={photo.url} width={1200} height={500} />
                             </div>
                         ))}
@@ -179,12 +179,17 @@ const PropertyView = ({ property }) => {
     )
 }
 
-export async function getServerSideProps({ query }) {
-    const { data } = await axios.get(`${process.env.API}/property/${query.slug}`);
-    
+export async function getServerSideProps(context) {
+    const { params } = context;
+    const { slug } = params;
+  
+    await db.connect();
+    const property = await Property.findOne({ slug }).lean();
+    console.log("property", db.convertDocToObj(property))
+    await db.disconnect();
     return {
       props: {
-        property: data,
+        property: property ? db.convertDocToObj(property) : null,
       },
     };
 }

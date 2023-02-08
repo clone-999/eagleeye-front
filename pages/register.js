@@ -1,48 +1,53 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { Context } from "../context";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import { SyncOutlined } from "@ant-design/icons";
-import { serverUrl } from "../utils/fetchApi";
+import { signIn, useSession } from "next-auth/react";
+import { useForm } from "react-hook-form";
 
 function Register() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const { data: session } = useSession();
     const [loading, setLoading] = useState(false);
 
-    const {
-        state: { user },
-    } = useContext(Context);
-
     const router = useRouter();
+    const { redirect } = router.query;
 
     useEffect(() => {
-        if (user !== null) router.push("/");
-    }, [user]);
+        if (session?.user) {
+            router.push(redirect || '/');
+        }
+    }, [router, session, redirect]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        // console.table({ name, email, password });
+    const {
+        handleSubmit,
+        register,
+        getValues,
+        formState: { errors },
+    } = useForm();
+
+    const submitHandler = async ({ name, email, password }) => {
         try {
-          setLoading(true);
-          const { data } = await axios.post(`/api/register`, {
-            name,
-            email,
-            password,
-          });
-          // console.log("REGISTER RESPONSE", data);
-          toast("Registration successful. Please login.");
-          setName("");
-          setEmail("");
-          setPassword("");
-          setLoading(false);
-          router.push("/login")
+            setLoading(true);
+            await axios.post('/api/auth/signup', {
+                name,
+                email,
+                password,
+            });
+
+            const result = await signIn('credentials', {
+                redirect: false,
+                email,
+                password,
+            });
+            if (result.error) {
+                toast.error(result.error);
+            }
+            setLoading(false);
         } catch (err) {
-          toast(err.response.data);
-          setLoading(false);
+            toast.error(getError(err));
+            setLoading(false);
         }
     };
 
@@ -59,12 +64,23 @@ function Register() {
                     </div>
                     <div className="modal-body">
                         <div className="contact-form-action">
-                            <form onSubmit={handleSubmit}>
+                            <form onSubmit={handleSubmit(submitHandler)}>
                                 <div className="input-box">
                                     <label className="label-text">Full Name</label>
                                     <div className="form-group">
                                         <span className="la la-user form-icon"></span>
-                                        <input className="form-control" type="text" placeholder="Enter Your Full Name" onChange={(e) => setName(e.target.value)} value={name} required />
+                                        <input 
+                                            type="text"
+                                            {...register('name', {
+                                                required: 'Please enter name',
+                                            })}
+                                            className="form-control" 
+                                            placeholder="Enter Your Full Name" 
+                                            id="name"
+                                            autoFocus />
+                                        {errors.name && (
+                                            <div className="error">{errors.name.message}</div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -72,7 +88,20 @@ function Register() {
                                     <label className="label-text">Email Adress</label>
                                     <div className="form-group">
                                         <span className="la la-envelope form-icon"></span>
-                                        <input className="form-control" type="email" onChange={(e) => setEmail(e.target.value)} placeholder="Enter email" value={email} required />
+                                        <input 
+                                            type="email" 
+                                            {...register('email', {
+                                                required: 'Please enter email',
+                                                pattern: {
+                                                  value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$/i,
+                                                  message: 'Please enter valid email',
+                                                },
+                                            })}
+                                            className="form-control" 
+                                            id="email" />
+                                        {errors.email && (
+                                            <div className="error">{errors.email.message}</div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -80,21 +109,64 @@ function Register() {
                                     <label className="label-text">Password</label>
                                     <div className="form-group">
                                         <span className="la la-lock form-icon"></span>
-                                        <input className="form-control" type="password" placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                                        <input 
+                                            className="form-control" 
+                                            type="password" 
+                                            placeholder="Enter password" 
+                                            {...register('password', {
+                                                required: 'Please enter password',
+                                                minLength: { value: 6, message: 'password is more than 5 chars' },
+                                            })} 
+                                            id="password"
+                                            autoFocus />
+                                        {errors.password && (
+                                            <div className="error">{errors.password.message}</div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="input-box">
+                                    <label className="label-text">Confirm Password</label>
+                                    <div className="form-group">
+                                        <span className="la la-lock form-icon"></span>
+                                        <input 
+                                            className="form-control" 
+                                            type="password" 
+                                            placeholder="Confirm password" 
+                                            {...register('confirmPassword', {
+                                                required: 'Please enter confirm password',
+                                                validate: (value) => value === getValues('password'),
+                                                minLength: {
+                                                  value: 6,
+                                                  message: 'confirm password is more than 5 chars',
+                                                },
+                                            })}
+                                            id="confirmPassword"
+                                            autoFocus />
+                                        {errors.confirmPassword && (
+                                            <div className="error">
+                                            {errors.confirmPassword.message}
+                                            </div>
+                                        )}
+
+                                        {errors.confirmPassword &&
+                                            errors.confirmPassword.type === 'validate' && (
+                                            <div className="error">Password do not match</div>
+                                        )}
                                     </div>
                                 </div>
 
                                 <hr />
 
                                 <div className="form-group mt-3">
-                                    <button type="submit" disabled={!name || !email || !password || loading} className="btn btn-default btn-lg btn-block effect" data-style="zoom-in">
+                                    <button type="submit" className="btn btn-default btn-lg btn-block effect" data-style="zoom-in">
                                         {loading ? <SyncOutlined spin /> : "Register"}
                                     </button>
                                 </div>
                             </form>
 
                             <div className="btn-box pb-1 mt-2">
-                                <Link href="/login" className="btn btn-block btn-outline-primary effect ladda-sm" data-style="zoom-in">Login</Link>
+                                <Link href={`/register?redirect=${redirect || '/'}`} className="btn btn-block btn-outline-primary effect ladda-sm" data-style="zoom-in">Login</Link>
                             </div>
                         </div>
                     </div>
